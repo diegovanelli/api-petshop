@@ -1,54 +1,56 @@
 const router = require('express').Router();
 const ProviderTable = require('./ProviderTable');
 const Provider = require('./Provider');
+const NotFound = require('../../errors/NotFound');
+const { ProviderSerializer } = require('../../serializer');
 
 router.get('/', async (_, res) => {
     const result = await ProviderTable.list();
     res.status(200);
+    const serializer = new ProviderSerializer (
+        res.getHeader('Content-Type')
+    )
     res.send(
-        JSON.stringify(result)
+        serializer.serializer(result)
     );
 })
 
-router.post('/', async (req, res) => {
+router.post('/', async (req, res, next) => {
     try {
         const returnData = req.body;
         const provider = new Provider(returnData);
         await provider.create();
         res.status(201);
+        const serializer = new ProviderSerializer (
+            res.getHeader('Content-Type')
+        )
         res.send(
-            JSON.stringify(provider)
+            serializer.serializer(provider)
         );
     } catch(error) {
-        res.status(400)
-        res.send(
-            JSON.stringify({
-                message: error.message
-            })
-        );
+        next(error)
     }
 })
 
-router.get('/:providerId', async (req, res) => {
+router.get('/:providerId', async (req, res, next) => {
     try {
         const id = req.params.providerId
         const provider = new Provider({ id: id });
         await provider.load();
         res.status(200);
+        const serializer = new ProviderSerializer (
+            res.getHeader('Content-Type'),
+            ['email', 'createdAt', 'updatedAt']
+        )
         res.send(
-            JSON.stringify(provider)
+            serializer.serializer(provider)
         );
     } catch (error) {
-        res.status(404)
-        res.send(
-            JSON.stringify({
-                message: error.message
-            })
-        );
+        next(error)
     }
 })
 
-router.put('/:providerId', async (req, res) => {
+router.put('/:providerId', async (req, res, next) => {
     try {
         const id = req.params.providerId
         const returnData = req.body
@@ -58,16 +60,11 @@ router.put('/:providerId', async (req, res) => {
         res.status(204);
         res.end();
     } catch (error) {
-        res.status(400);
-        res.send(
-            JSON.stringify({
-                message: error.message
-            })
-        );
+        next(error)
     }
 })
 
-router.delete('/:providerId', async (req, res) => {
+router.delete('/:providerId', async (req, res, next) => {
     try {
         const id = req.params.providerId;
         const provider = new Provider({ id: id });
@@ -76,12 +73,7 @@ router.delete('/:providerId', async (req, res) => {
         res.status(204);
         res.end();
     } catch(error) {
-        res.status(404);
-        res.send(
-            JSON.stringify({
-                message: error.message
-            })
-        );
+        next(error)
     }
 })
 

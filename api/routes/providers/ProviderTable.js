@@ -1,8 +1,9 @@
 const Model = require('./TableModelProviders');
+const NotFound = require('../../errors/NotFound')
 
 module.exports = {
     list () {
-        return Model.findAll()
+        return Model.findAll({raw: true})
     },
     insert(provider) {
         return Model.create(provider)
@@ -14,7 +15,7 @@ module.exports = {
             }
         })
         if (!provider) {
-            throw new Error('Provider not found')
+            throw new NotFound()
         }
 
         return provider
