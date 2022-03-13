@@ -1,7 +1,6 @@
 const router = require('express').Router();
 const ProviderTable = require('./ProviderTable');
 const Provider = require('./Provider');
-const NotFound = require('../../errors/NotFound');
 const { ProviderSerializer } = require('../../serializer');
 
 router.get('/', async (_, res) => {
@@ -76,5 +75,21 @@ router.delete('/:providerId', async (req, res, next) => {
         next(error)
     }
 })
+
+const productsRouter = require('./products')
+
+const verifyProvider = async (req, res, next) => {
+    try {
+        const id = req.params.providerId
+        const provider = new Provider({ id: id })
+        await provider.load()
+        req.provider = provider
+        next()
+    } catch (error) {
+        next(error)
+    }
+}
+
+router.use('/:providerId/products', verifyProvider, productsRouter)
 
 module.exports = router;

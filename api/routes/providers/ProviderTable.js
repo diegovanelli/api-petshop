@@ -1,4 +1,4 @@
-const Model = require('./TableModelProviders');
+const Model = require('./ProvidersTableModel');
 const NotFound = require('../../errors/NotFound')
 
 module.exports = {
