@@ -1,4 +1,6 @@
+const NotFound = require('../../../errors/NotFound')
 const Model = require('./ProductTableModel')
+const instance = require('../../../data-base')
 
 module.exports = {
     list(providerId) {
@@ -17,6 +19,45 @@ module.exports = {
                 id: productId,
                 provider: productId
             }
+        })
+    },
+    async getById(productId, providerId) {
+        const product = await Model.findOne({
+            where: {
+                id: productId,
+                provider: productId
+            },
+            raw: true
+        })
+
+        if (!product) {
+            throw new NotFound('Product')
+        }
+
+        return product
+    },
+    update(productData, updateData) {
+        return Model.update(
+            updateData, 
+            {
+                where: productData
+            }
+        )
+    },
+    subtract(productId, providerId, field, quantity) {
+        return instance.transaction(async transaction => {
+            const product = await Model.findOne({
+                where: {
+                    id: productId,
+                    provider: providerId
+                }
+            })
+
+            product[field] = quantity
+
+            await product.save()
+
+            return product
         })
     }
 }

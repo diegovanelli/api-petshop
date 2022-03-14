@@ -1,4 +1,5 @@
 const InvalidField = require('../../../errors/InvalidField')
+const NoData = require('../../../errors/NoData')
 const Table = require('./ProductTable')
 
 class Product {
@@ -38,6 +39,52 @@ class Product {
 
     delete() {
         return Table.remove(this.id, this.provider)
+    }
+
+    async load() {
+        const product = await Table.getById(this.id, this.provider)
+        this.title = product.title
+        this.price = product.price
+        this.stock = product.stock
+        this.createdAt = product.createdAt
+        this.updatedAt = product.updatedAt
+    }
+
+    update() {
+        const updateData = {}
+
+        if (typeof this.title === 'string' && this.title.length > 0) {
+            updateData.title = this.title
+        }
+
+        if (typeof this.price === 'number' && this.price > 0) {
+            updateData.price = this.price
+        }
+
+        if (typeof this.stock === 'number') {
+            updateData.stock = this.stock
+        }
+
+        if (Object.keys(updateData).length === 0) {
+            throw new NoData()
+        }
+
+        return Table.update(
+            {
+                id: this.id,
+                provider: this.provider
+            },
+            updateData
+        )
+    }
+
+    decreaseStock() {
+        return Table.subtract(
+            this.id,
+            this.provider,
+            'stock',
+            this.stock
+        )
     }
 }
 

@@ -1,6 +1,6 @@
 class NotFound extends Error {
-    constructor() {
-        super('Provider not found!')
+    constructor(table) {
+        super(`${table} not found!`)
         this.name = 'NotFound'
         this.idError = 0
         this.status = 404
