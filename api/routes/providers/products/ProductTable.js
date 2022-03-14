@@ -7,7 +7,8 @@ module.exports = {
         return Model.findAll({
             where: {
                 provider: providerId
-            }
+            },
+            raw: true
         })
     },
     insert(data) {
@@ -17,7 +18,7 @@ module.exports = {
         return Model.destroy({
             where: {
                 id: productId,
-                provider: productId
+                provider: providerId
             }
         })
     },
@@ -25,7 +26,7 @@ module.exports = {
         const product = await Model.findOne({
             where: {
                 id: productId,
-                provider: productId
+                provider: providerId
             },
             raw: true
         })
