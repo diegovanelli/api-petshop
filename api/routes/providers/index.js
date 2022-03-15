@@ -3,6 +3,8 @@ const ProviderTable = require('./ProviderTable');
 const Provider = require('./Provider');
 const { ProviderSerializer } = require('../../serializer');
 
+router = setOptionRouter(router, '/', 'GET, POST')
+
 router.get('/', async (_, res) => {
     const result = await ProviderTable.list();
     res.status(200);
@@ -30,6 +32,8 @@ router.post('/', async (req, res, next) => {
         next(error)
     }
 })
+
+router = setOptionRouter(router, '/:providerId', 'GET, POST, DELETE')
 
 router.get('/:providerId', async (req, res, next) => {
     try {

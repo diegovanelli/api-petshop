@@ -3,6 +3,8 @@ const { ProductSerializer } = require('../../../serializer.js')
 const Product = require('./Product.js')
 const Table = require('./ProductTable.js')
 
+router = setOptionRouter(router, '/', 'GET, POST')
+
 router.get('/' , async (req, res) => {
     const products = await Table.list(req.provider.id)
     const serializer = new ProductSerializer(
@@ -33,6 +35,8 @@ router.post('/', async (req, res, next) => {
         next(error)
     }
 })
+
+router = setOptionRouter(router, '/:id', 'DELETE, GET, HEAD, PUT')
 
 router.delete('/:id', async (req, res) => {
     const data = {
@@ -93,6 +97,8 @@ router.put('/:id', async (req, res, next) => {
         next(error)
     }
 })
+
+router = setOptionRouter(router, '/:id/decrease-stock', 'POST')
 
 router.post('/:id/decrease-stock', async (req, res, next) => {
     try {
