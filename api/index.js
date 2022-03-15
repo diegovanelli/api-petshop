@@ -31,6 +31,9 @@ app.use((error, _, res, next) => {
     const serializer = new ErrorSerializer(
         res.getHeader('Content-Type')
     )
+    if (!error.status) {
+        error.status = 500
+    }
     res.status(error.status);
     res.send(
         serializer.serializer({
